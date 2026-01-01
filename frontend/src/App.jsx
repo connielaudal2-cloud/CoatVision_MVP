@@ -2,6 +2,7 @@
 // v2
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
@@ -10,13 +11,16 @@ import Reports from "./pages/Reports";
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/jobs" element={<Jobs />} />
-        <Route path="/agents" element={<Agents />} />
-        <Route path="/reports" element={<Reports />} />
-      </Routes>
-    </Layout>
+    <>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/agents" element={<Agents />} />
+          <Route path="/reports" element={<Reports />} />
+        </Routes>
+      </Layout>
+      <Analytics />
+    </>
   );
 }
