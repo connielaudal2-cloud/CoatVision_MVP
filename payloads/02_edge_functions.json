@@ -1,0 +1,324 @@
+{
+  "description": "ForgeOS Edge Functions Examples - Supabase Edge Functions for serverless API endpoints",
+  "version": "1.0.0",
+  "last_updated": "2026-01-03",
+  "note": "These are example edge function configurations. Deploy via Supabase CLI or dashboard.",
+  
+  "edge_functions": [
+    {
+      "name": "analyze-image",
+      "description": "Edge function for image analysis with OpenAI",
+      "runtime": "deno",
+      "path": "supabase/functions/analyze-image",
+      "environment_variables": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      },
+      "handler_example": {
+        "method": "POST",
+        "endpoint": "https://[project].supabase.co/functions/v1/analyze-image",
+        "headers": {
+          "Authorization": "Bearer ${SUPABASE_ANON_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "image_url": "https://example.com/image.jpg",
+          "options": {
+            "sensitivity": "high",
+            "model": "gpt-4-vision-preview"
+          }
+        },
+        "response": {
+          "analysis_id": "uuid",
+          "metrics": {
+            "cvi": 0.85,
+            "cqi": 0.78,
+            "description": "AI-generated description"
+          },
+          "processing_time_ms": 2500
+        }
+      }
+    },
+    
+    {
+      "name": "generate-report",
+      "description": "Edge function for PDF report generation",
+      "runtime": "deno",
+      "path": "supabase/functions/generate-report",
+      "environment_variables": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}",
+        "REPORT_STORAGE_BUCKET": "reports"
+      },
+      "handler_example": {
+        "method": "POST",
+        "endpoint": "https://[project].supabase.co/functions/v1/generate-report",
+        "headers": {
+          "Authorization": "Bearer ${SUPABASE_ANON_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "analysis_id": "550e8400-e29b-41d4-a716-446655440000",
+          "template": "standard",
+          "options": {
+            "include_images": true,
+            "language": "en"
+          }
+        },
+        "response": {
+          "report_id": "uuid",
+          "url": "https://[project].supabase.co/storage/v1/object/public/reports/report.pdf",
+          "status": "completed",
+          "metadata": {
+            "pages": 5,
+            "size_bytes": 245760
+          }
+        }
+      }
+    },
+    
+    {
+      "name": "webhook-handler",
+      "description": "Edge function for handling incoming webhooks",
+      "runtime": "deno",
+      "path": "supabase/functions/webhook-handler",
+      "environment_variables": {
+        "WEBHOOK_SECRET": "${WEBHOOK_SECRET}",
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      },
+      "handler_example": {
+        "method": "POST",
+        "endpoint": "https://[project].supabase.co/functions/v1/webhook-handler",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Webhook-Signature": "hmac-sha256-signature"
+        },
+        "body": {
+          "event": "analysis.completed",
+          "timestamp": "2026-01-03T12:00:00Z",
+          "data": {
+            "analysis_id": "uuid",
+            "status": "completed",
+            "user_id": "uuid"
+          }
+        },
+        "response": {
+          "received": true,
+          "processed": true
+        }
+      }
+    },
+    
+    {
+      "name": "batch-processor",
+      "description": "Edge function for processing batch jobs",
+      "runtime": "deno",
+      "path": "supabase/functions/batch-processor",
+      "environment_variables": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}",
+        "MAX_BATCH_SIZE": "50"
+      },
+      "handler_example": {
+        "method": "POST",
+        "endpoint": "https://[project].supabase.co/functions/v1/batch-processor",
+        "headers": {
+          "Authorization": "Bearer ${SUPABASE_ANON_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "job_type": "batch_analysis",
+          "image_ids": [
+            "550e8400-e29b-41d4-a716-446655440001",
+            "550e8400-e29b-41d4-a716-446655440002",
+            "550e8400-e29b-41d4-a716-446655440003"
+          ],
+          "options": {
+            "parallel": true,
+            "sensitivity": "medium"
+          }
+        },
+        "response": {
+          "job_id": "uuid",
+          "status": "queued",
+          "estimated_completion": "2026-01-03T12:05:00Z",
+          "items_queued": 3
+        }
+      }
+    },
+    
+    {
+      "name": "auth-validator",
+      "description": "Edge function for custom authentication validation",
+      "runtime": "deno",
+      "path": "supabase/functions/auth-validator",
+      "environment_variables": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}",
+        "ALLOWED_DOMAINS": "example.com,coatvision.com"
+      },
+      "handler_example": {
+        "method": "POST",
+        "endpoint": "https://[project].supabase.co/functions/v1/auth-validator",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "token": "jwt-token-here",
+          "action": "validate"
+        },
+        "response": {
+          "valid": true,
+          "user_id": "uuid",
+          "roles": ["authenticated", "user"],
+          "expires_at": "2026-01-03T13:00:00Z"
+        }
+      }
+    }
+  ],
+  
+  "deployment_instructions": {
+    "prerequisites": [
+      "Supabase CLI installed: npm install -g supabase",
+      "Logged in to Supabase: supabase login",
+      "Linked to project: supabase link --project-ref [project-id]"
+    ],
+    "commands": [
+      {
+        "description": "Initialize functions directory",
+        "command": "supabase functions new [function-name]"
+      },
+      {
+        "description": "Deploy a function",
+        "command": "supabase functions deploy [function-name]"
+      },
+      {
+        "description": "Deploy with environment variables",
+        "command": "supabase secrets set OPENAI_API_KEY=[key] --project-ref [project-id]"
+      },
+      {
+        "description": "Test function locally",
+        "command": "supabase functions serve [function-name]"
+      },
+      {
+        "description": "View function logs",
+        "command": "supabase functions logs [function-name]"
+      }
+    ],
+    "file_structure": {
+      "description": "Create this structure in your project",
+      "structure": {
+        "supabase/": {
+          "functions/": {
+            "analyze-image/": {
+              "index.ts": "Main handler file",
+              "config.json": "Function configuration"
+            },
+            "generate-report/": {
+              "index.ts": "Main handler file",
+              "config.json": "Function configuration"
+            }
+          }
+        }
+      }
+    }
+  },
+  
+  "example_handler_code": {
+    "language": "typescript",
+    "description": "Basic edge function handler structure",
+    "code": "// supabase/functions/analyze-image/index.ts\n\nimport { serve } from 'https://deno.land/std@0.168.0/http/server.ts'\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\n\nconst corsHeaders = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',\n}\n\nserve(async (req) => {\n  // Handle CORS preflight\n  if (req.method === 'OPTIONS') {\n    return new Response('ok', { headers: corsHeaders })\n  }\n\n  try {\n    // Get environment variables\n    const supabaseUrl = Deno.env.get('SUPABASE_URL')!\n    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!\n    const openaiKey = Deno.env.get('OPENAI_API_KEY')!\n\n    // Initialize Supabase client\n    const supabase = createClient(supabaseUrl, supabaseKey)\n\n    // Parse request body\n    const { image_url, options } = await req.json()\n\n    // TODO: Implement OpenAI Vision API call here\n    // TODO: Process image analysis\n    // TODO: Store results in database\n\n    const result = {\n      analysis_id: crypto.randomUUID(),\n      metrics: { cvi: 0.85, cqi: 0.78 },\n      processing_time_ms: 2500\n    }\n\n    return new Response(\n      JSON.stringify(result),\n      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }\n    )\n  } catch (error) {\n    return new Response(\n      JSON.stringify({ error: error.message }),\n      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }\n    )\n  }\n})"
+  },
+  
+  "common_patterns": {
+    "authentication": {
+      "description": "Verify JWT token from Authorization header",
+      "example": "const authHeader = req.headers.get('Authorization')!\nconst token = authHeader.replace('Bearer ', '')\nconst { data: { user } } = await supabase.auth.getUser(token)"
+    },
+    "database_operations": {
+      "description": "Query database via Supabase client",
+      "example": "const { data, error } = await supabase\n  .from('analyses')\n  .insert({ filename: 'test.jpg', user_id: user.id })\n  .select()"
+    },
+    "storage_operations": {
+      "description": "Upload files to Supabase Storage",
+      "example": "const { data, error } = await supabase.storage\n  .from('images')\n  .upload(`${user.id}/image.jpg`, fileBuffer)"
+    },
+    "error_handling": {
+      "description": "Standard error response format",
+      "example": "return new Response(\n  JSON.stringify({ error: { code: 'ERROR_CODE', message: 'Description' } }),\n  { headers: corsHeaders, status: 400 }\n)"
+    }
+  },
+  
+  "environment_variables": {
+    "description": "All edge functions should use environment variable placeholders",
+    "required": [
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_ANON_KEY"
+    ],
+    "optional": [
+      "OPENAI_API_KEY",
+      "WEBHOOK_SECRET",
+      "SENTRY_DSN",
+      "LOG_LEVEL"
+    ],
+    "setting_secrets": {
+      "via_cli": "supabase secrets set KEY=value --project-ref [project-id]",
+      "via_dashboard": "Project Settings > Edge Functions > Secrets"
+    }
+  },
+  
+  "testing": {
+    "local_testing": {
+      "command": "supabase functions serve",
+      "url": "http://localhost:54321/functions/v1/[function-name]",
+      "example_request": "curl -X POST http://localhost:54321/functions/v1/analyze-image \\\n  -H 'Authorization: Bearer [anon-key]' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"image_url\": \"https://example.com/image.jpg\"}'"
+    },
+    "unit_testing": {
+      "framework": "Deno test",
+      "command": "deno test --allow-all",
+      "example": "// analyze-image.test.ts\nimport { assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts'\n\nDeno.test('analyze image function', async () => {\n  // Test implementation\n  assertEquals(1 + 1, 2)\n})"
+    }
+  },
+  
+  "monitoring": {
+    "logging": {
+      "description": "View function logs via CLI or dashboard",
+      "cli_command": "supabase functions logs [function-name] --project-ref [project-id]",
+      "dashboard": "Dashboard > Edge Functions > [function] > Logs"
+    },
+    "metrics": {
+      "available_metrics": [
+        "Invocations per minute",
+        "Error rate",
+        "Execution duration",
+        "Cold start time"
+      ],
+      "dashboard": "Dashboard > Edge Functions > Analytics"
+    }
+  },
+  
+  "best_practices": [
+    "Use environment variables for all secrets and configuration",
+    "Implement proper CORS headers for browser requests",
+    "Validate input data before processing",
+    "Use try-catch blocks for error handling",
+    "Return consistent JSON response formats",
+    "Log errors for debugging",
+    "Keep functions focused and single-purpose",
+    "Use TypeScript for type safety",
+    "Test locally before deploying",
+    "Set appropriate timeout limits",
+    "Implement rate limiting for public endpoints",
+    "Cache results when appropriate"
+  ],
+  
+  "resources": {
+    "documentation": "https://supabase.com/docs/guides/functions",
+    "examples": "https://github.com/supabase/supabase/tree/master/examples/edge-functions",
+    "cli_reference": "https://supabase.com/docs/reference/cli",
+    "deno_docs": "https://deno.land/manual"
+  }
+}

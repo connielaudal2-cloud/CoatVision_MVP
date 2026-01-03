@@ -1,176 +1,374 @@
-# AI Platform Status - CoatVision MVP
+# ForgeOS Platform - System Contract, Status & Roadmap
 
-## Problem Statement
-**Norwegian:** "hvor er ai platformen min fra sparks?"  
-**English:** "where is my AI platform from sparks?"
-
-## Investigation Summary
-
-This document provides clarification on the current state of AI integration in the CoatVision MVP project.
-
-### Search Results
-
-After thorough investigation of the codebase, **no references to "Sparks" were found** in:
-- Python files (.py)
-- JavaScript/TypeScript files (.js, .ts, .tsx)
-- Configuration files (.json, .yml, .yaml)
-- Documentation files (.md)
-- Git commit history
-- Environment variables or configuration files
-
-## Current AI Capabilities
-
-### 1. OpenAI Integration (Prepared but Not Implemented)
-
-**Status:** ⚠️ Ready for implementation
-
-- **Location:** `backend/requirements.txt`
-- **Version:** openai==1.51.0
-- **Implementation Status:** Dependency installed but not yet integrated into the codebase
-
-**No OpenAI API calls are currently made anywhere in the backend code.**
-
-### 2. LYXbot Agent
-
-**Status:** ⚠️ Placeholder implementation
-
-- **Location:** `backend/routers/lyxbot.py`
-- **Endpoints:**
-  - `GET /api/lyxbot/status` - Returns basic status
-  - `POST /api/lyxbot/command` - Accepts commands but returns "not yet implemented"
-
-**Current Implementation:**
-```python
-@router.post("/command")
-async def lyxbot_command(payload: dict):
-    """Send a command to LYXbot agent."""
-    command = payload.get("command", "")
-    return {
-        "status": "received",
-        "command": command,
-        "message": "LYXbot command processing not yet implemented"
-    }
-```
-
-### 3. Image Analysis with OpenCV
-
-**Status:** ✅ Basic implementation exists
-
-- **Location:** `backend/app/services/analyzer.py`
-- **Technology:** OpenCV (cv2) for image processing
-- **Current Functionality:** 
-  - Edge detection using Canny algorithm
-  - Basic coating coverage estimation
-  - Output image with green overlay
-
-**Note from code:**
-```python
-metrics: Dict[str, Any] = {
-    "edge_coverage_ratio": coverage,
-    "note": "Dummy-metrikk – byttes ut med ekte AI-modell senere.",
-}
-```
-Translation: "Dummy metric – to be replaced with real AI model later."
-
-## Possible Scenarios
-
-### 1. Sparks Platform Not Yet Added
-If "Sparks" is an external AI platform or service that was planned but not yet integrated:
-- No integration code exists
-- Need to implement the connection
-- Need API keys/credentials configuration
-
-### 2. Sparks Platform Removed
-If "Sparks" was previously integrated:
-- Check git history for removed files: `git log --all --full-history --diff-filter=D -- "*sparks*"`
-- May have been removed in a previous commit
-
-### 3. Different Repository
-The "Sparks" AI platform may exist in:
-- A different repository
-- A private submodule
-- A separate microservice
-- An external service not tracked in this repo
-
-### 4. Alternative Name
-The platform might be referenced under a different name:
-- LYXbot (current agent placeholder)
-- CoatVision Core
-- Custom AI service
-
-## Recommendations
-
-### To Integrate OpenAI
-
-1. **Create OpenAI Service Module**
-   ```bash
-   backend/app/services/ai_service.py
-   ```
-
-2. **Add Environment Variable**
-   ```bash
-   # .env
-   OPENAI_API_KEY=your-api-key-here
-   ```
-
-3. **Implement AI Analysis**
-   - Replace placeholder in `analyzer.py`
-   - Use GPT-4 Vision for image analysis
-   - Integrate with coating detection logic
-
-### To Find Sparks Platform
-
-1. **Check External Services**
-   - Review any external API documentation
-   - Check deployment configurations
-   - Review cloud service integrations
-
-2. **Contact Team Members**
-   - Ask who implemented "Sparks"
-   - Check internal documentation
-   - Review project planning documents
-
-3. **Check Related Repositories**
-   - Search organization for "Sparks"
-   - Check for private repositories
-   - Review microservices architecture
-
-### To Implement LYXbot
-
-1. **Define Agent Capabilities**
-   - Determine what commands LYXbot should handle
-   - Design conversation flow
-   - Plan integration with OpenAI
-
-2. **Implement Command Processing**
-   - Add command router logic
-   - Integrate with OpenAI Chat API
-   - Add response formatting
-
-3. **Add Testing**
-   - Unit tests for command processing
-   - Integration tests for API endpoints
-   - Mock OpenAI responses
-
-## Next Steps
-
-**Please clarify:**
-1. What is the "Sparks" platform?
-2. Where should it be located?
-3. Is it an internal service or external API?
-4. What functionality should it provide?
-5. Are there credentials or configuration needed?
-
-## Contact
-
-If you have more information about the Sparks platform, please:
-1. Update this document with details
-2. Provide integration documentation
-3. Share API endpoints and authentication details
-4. Link to any external documentation
+**Version:** 1.0.0  
+**Last Updated:** 2026-01-03  
+**Status:** Active Development
 
 ---
 
-**Last Updated:** 2025-12-08  
-**Investigated By:** Copilot Agent  
-**Status:** Awaiting clarification on "Sparks" platform
+## Table of Contents
+
+1. [System Contract](#system-contract)
+2. [Current Status](#current-status)
+3. [Roadmap](#roadmap)
+4. [Architecture Overview](#architecture-overview)
+5. [Environment Configuration](#environment-configuration)
+6. [Integration Guide](#integration-guide)
+
+---
+
+## System Contract
+
+### Overview
+
+ForgeOS is an AI-powered coating analysis platform built on the CoatVision foundation. The platform provides image analysis, quality inspection, and automated reporting capabilities through a microservices architecture.
+
+### Core Components
+
+#### 1. Backend API (FastAPI)
+- **Technology:** Python 3.10+, FastAPI, OpenCV
+- **Responsibility:** Image processing, AI analysis, data persistence
+- **Endpoints:** REST API for all platform operations
+- **Location:** `/backend/`
+
+#### 2. Web Dashboard (React)
+- **Technology:** React, TypeScript, Vite
+- **Responsibility:** Web-based user interface and administration
+- **Location:** `/frontend/`
+
+#### 3. Mobile Application (React Native)
+- **Technology:** React Native, Expo
+- **Responsibility:** Field image capture and analysis
+- **Location:** `/mobile/`
+
+#### 4. Database Layer (Supabase/PostgreSQL)
+- **Technology:** PostgreSQL with Supabase extensions
+- **Responsibility:** Data persistence, authentication, real-time updates
+- **Schema:** See `/specs/db-contracts.md` and `/payloads/01_db.sql`
+
+### Service Level Agreements
+
+#### Availability
+- **Target:** 99.5% uptime
+- **Monitoring:** Health check endpoint at `/health`
+- **Recovery:** Automatic restarts via container orchestration
+
+#### Performance
+- **Image Analysis:** < 5 seconds per image
+- **API Response:** < 500ms for non-analysis endpoints
+- **Report Generation:** < 10 seconds per report
+
+#### Security
+- **Authentication:** JWT-based authentication via Supabase
+- **Authorization:** Row-Level Security (RLS) policies
+- **Data Encryption:** TLS 1.3 for data in transit
+- **Secrets Management:** Environment variables only (no hardcoded secrets)
+
+### API Contract
+
+All API endpoints follow REST principles:
+- **Base URL:** `${API_URL}/api/`
+- **Authentication:** Bearer token in Authorization header
+- **Response Format:** JSON
+- **Error Handling:** Standard HTTP status codes with descriptive messages
+
+See `/specs/api-contracts.md` for detailed endpoint specifications.
+
+### Data Contract
+
+- **Image Storage:** Supabase Storage buckets
+- **Metadata:** PostgreSQL via Supabase
+- **Real-time Updates:** Supabase Realtime subscriptions
+- **Retention:** Configurable per installation
+
+See `/specs/db-contracts.md` for database schema and contracts.
+
+---
+
+## Current Status
+
+### ✅ Implemented Features
+
+#### Backend
+- [x] FastAPI REST API foundation
+- [x] Image upload and storage
+- [x] Basic OpenCV image analysis
+- [x] Health check and monitoring endpoints
+- [x] Report generation (PDF via ReportLab)
+- [x] Supabase integration
+- [x] Docker containerization
+
+#### Frontend
+- [x] React-based dashboard
+- [x] Image upload interface
+- [x] Analysis results display
+- [x] Report viewing
+- [x] Responsive design
+
+#### Mobile
+- [x] React Native/Expo application
+- [x] Camera integration
+- [x] Image upload to backend
+- [x] Analysis result viewing
+
+#### Infrastructure
+- [x] Docker Compose deployment
+- [x] Render.com deployment configuration
+- [x] Supabase backend setup
+- [x] CI/CD workflows
+
+### ⚠️ In Development
+
+#### AI/ML Integration
+- [ ] OpenAI GPT-4 Vision integration (dependency installed, not implemented)
+- [ ] Advanced coating quality metrics
+- [ ] AI-powered defect detection
+- [ ] LYXbot agent (placeholder exists at `/backend/routers/lyxbot.py`)
+
+#### Advanced Features
+- [ ] Batch image processing
+- [ ] Custom training data management
+- [ ] Advanced reporting templates
+- [ ] Real-time collaboration features
+
+#### Platform Enhancements
+- [ ] Multi-tenant support
+- [ ] Advanced role-based access control
+- [ ] Audit logging
+- [ ] Performance optimization
+
+### 🔴 Known Limitations
+
+1. **AI Analysis:** Current image analysis uses basic OpenCV edge detection. Advanced AI models not yet integrated.
+2. **LYXbot Agent:** Placeholder implementation only - command processing not functional.
+3. **Scalability:** Not yet optimized for high-volume concurrent processing.
+4. **Offline Support:** Mobile app requires internet connection.
+
+---
+
+## Roadmap
+
+### Phase 1: Foundation (Current - Q1 2026)
+**Goal:** Establish stable platform foundation
+
+- [x] Basic image analysis pipeline
+- [x] REST API implementation
+- [x] Database schema and migrations
+- [x] Deployment infrastructure
+- [ ] Complete OpenAI integration
+- [ ] Implement LYXbot agent
+- [ ] Enhanced error handling and logging
+
+### Phase 2: AI Enhancement (Q1 2026 - Q2 2026)
+**Goal:** Advanced AI-powered analysis
+
+- [ ] GPT-4 Vision integration for image analysis
+- [ ] Custom ML model training pipeline
+- [ ] Defect classification system
+- [ ] Automated quality scoring (CVI, CQI metrics)
+- [ ] AI-powered recommendations
+- [ ] Training data management system
+
+### Phase 3: Platform Maturity (Q2 2026 - Q3 2026)
+**Goal:** Enterprise-ready features
+
+- [ ] Multi-tenant architecture
+- [ ] Advanced RBAC and permissions
+- [ ] Audit trail and compliance logging
+- [ ] Custom reporting templates
+- [ ] Batch processing capabilities
+- [ ] API rate limiting and quotas
+- [ ] Webhook integrations
+
+### Phase 4: Scale & Optimize (Q3 2026 - Q4 2026)
+**Goal:** Performance and scalability
+
+- [ ] Horizontal scaling support
+- [ ] Caching layer (Redis)
+- [ ] CDN integration for assets
+- [ ] Background job processing (Celery)
+- [ ] Performance monitoring (APM)
+- [ ] Load testing and optimization
+- [ ] Edge computing support
+
+### Phase 5: Ecosystem (Q4 2026+)
+**Goal:** Platform extensibility
+
+- [ ] Public API documentation
+- [ ] Third-party integrations
+- [ ] Plugin system
+- [ ] Mobile SDK
+- [ ] Marketplace for extensions
+- [ ] Developer portal
+
+---
+
+## Architecture Overview
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    ForgeOS Platform                      │
+└─────────────────────────────────────────────────────────┘
+
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│   Mobile     │         │     Web      │         │   Backend    │
+│     App      │────────▶│   Dashboard  │────────▶│   API        │
+│ (React       │         │   (React)    │         │  (FastAPI)   │
+│  Native)     │         │              │         │              │
+└──────────────┘         └──────────────┘         └──────────────┘
+                                                          │
+                         ┌────────────────────────────────┼────┐
+                         │                                │    │
+                    ┌────▼─────┐                   ┌─────▼────▼───┐
+                    │ Supabase │                   │   OpenAI     │
+                    │ Database │                   │     API      │
+                    │ + Storage│                   │              │
+                    └──────────┘                   └──────────────┘
+```
+
+### Technology Stack
+
+- **Backend:** Python 3.11, FastAPI, uvicorn, OpenCV, ReportLab
+- **Frontend:** React 18, TypeScript, Vite, TailwindCSS
+- **Mobile:** React Native, Expo SDK 51+
+- **Database:** PostgreSQL 15+ (via Supabase)
+- **Storage:** Supabase Storage
+- **Authentication:** Supabase Auth (JWT)
+- **AI/ML:** OpenAI GPT-4 Vision API
+- **Deployment:** Docker, Render.com, Vercel
+- **CI/CD:** GitHub Actions
+
+---
+
+## Environment Configuration
+
+### Required Environment Variables
+
+All secrets and configuration must be provided via environment variables. **Never hardcode credentials.**
+
+#### Backend (.env)
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key
+
+# API Configuration
+SECRET_KEY=your-generated-secret-key
+API_PORT=8000
+NODE_ENV=production
+
+# AI Services
+OPENAI_API_KEY=sk-your-openai-api-key
+
+# Optional
+SENTRY_DSN=https://your-sentry-dsn
+LOG_LEVEL=INFO
+```
+
+#### Frontend (.env)
+```bash
+VITE_API_URL=https://your-backend.onrender.com
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+#### Mobile (.env)
+```bash
+EXPO_PUBLIC_API_URL=https://your-backend.onrender.com
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+### Generating Secrets
+
+```bash
+# Generate SECRET_KEY
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Supabase keys available in: Project Settings > API
+```
+
+---
+
+## Integration Guide
+
+### Quick Start
+
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/your-org/CoatVision_MVP.git
+   cd CoatVision_MVP
+   ```
+
+2. **Set Up Environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your credentials
+   ```
+
+3. **Deploy Database Schema**
+   ```bash
+   # Apply schema via Supabase SQL Editor
+   # Or use: psql $DATABASE_URL < payloads/01_db.sql
+   ```
+
+4. **Start Services**
+   ```bash
+   # Using Docker Compose
+   docker-compose up -d
+
+   # Or individually
+   cd backend && uvicorn main:app --reload
+   cd frontend && npm run dev
+   cd mobile && npm start
+   ```
+
+5. **Verify Health**
+   ```bash
+   curl http://localhost:8000/health
+   ```
+
+### API Integration
+
+See `/specs/api-contracts.md` for detailed API documentation.
+
+Example: Analyze an image
+```bash
+curl -X POST http://localhost:8000/api/analyze/ \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@image.jpg"
+```
+
+### Database Integration
+
+See `/specs/db-contracts.md` for schema details and `/payloads/01_db.sql` for setup.
+
+### Edge Functions
+
+See `/payloads/02_edge_functions.json` for Supabase Edge Function examples.
+
+---
+
+## Support and Contributing
+
+### Documentation
+- **System Contract:** `/docs/system-contract.md`
+- **API Specs:** `/specs/api-contracts.md`
+- **Database Schema:** `/specs/db-contracts.md`
+- **Setup Examples:** `/payloads/`
+
+### Getting Help
+- Check documentation in `/docs/`
+- Review example payloads in `/payloads/`
+- See deployment guides in root directory
+- Open an issue on GitHub
+
+### Contributing
+See `CONTRIBUTING.md` for development guidelines.
+
+---
+
+**This document serves as the canonical reference for ForgeOS platform status, roadmap, and system contracts.**
