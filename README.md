@@ -14,14 +14,29 @@
   - Use `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` (never service key)
 
 ### Supabase Schema
-- Apply via SQL Editor using [supabase/schema.sql](supabase/schema.sql) or run: `supabase/apply-schema.ps1` (requires `psql`).
+- **New**: Apply comprehensive schema using [payloads/01_db.sql](payloads/01_db.sql) - includes all tables, RLS, and functions
+- **Legacy**: Or use [supabase/schema.sql](supabase/schema.sql) with [supabase/apply-schema.ps1](supabase/apply-schema.ps1)
 - Verify RPCs/tables: run `verify_and_cleanup.ps1` after setting `SUPABASE_URL`/`SUPABASE_SERVICE_KEY`.
+- See [Database Contracts](specs/db-contracts.md) for complete schema documentation
 
 ### Local Quickstart
 - Execute [scripts/bootstrap-e2e.ps1](scripts/bootstrap-e2e.ps1) to build backend (Docker), optionally apply schema, and verify.
 # CoatVision_MVP
 
 CoatVision is a coating analysis application with a FastAPI backend, React dashboard, and React Native mobile app.
+
+## 📚 ForgeOS Documentation
+
+**Complete platform documentation** is now available:
+- **[Documentation Index](./docs/README.md)** - Complete documentation overview
+- **[System Contract](./docs/system-contract.md)** - Platform architecture and specifications
+- **[Current Status](./docs/status.md)** - Platform status and health
+- **[Roadmap](./docs/roadmap.md)** - Development roadmap and plans
+- **[API Contracts](./specs/api-contracts.md)** - Complete API documentation
+- **[Database Contracts](./specs/db-contracts.md)** - Database schema and contracts
+- **[Example Payloads](./payloads/)** - Ready-to-use setup examples
+
+**Single Source of Truth**: The ForgeOS documentation provides everything needed to build, deploy, and extend the platform without external dependencies.
 
 ## 🚀 Deploy to Production
 
