@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 
 from .models import AnalyzeResponse
 from .services.analyzer import analyze_image
+from .routers import sparks
 
 # Basestier
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,6 +25,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(sparks.router)
 
 @app.get("/")
 def root():
