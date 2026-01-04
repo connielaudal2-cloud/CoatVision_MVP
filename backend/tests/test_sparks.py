@@ -44,7 +44,7 @@ class TestSparksAPI:
             "app_type": "web",
             "framework": "FastAPI",
             "timestamp": "2026-01-04T00:00:00",
-            "model_used": "gpt-4o"
+            "model_used": "gpt-4o-mini"
         }
         
         payload = {
