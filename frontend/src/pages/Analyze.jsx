@@ -1,7 +1,7 @@
 // frontend/src/pages/Analyze.jsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export default function Analyze() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -11,24 +11,39 @@ export default function Analyze() {
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Helper function to handle file selection
+  const selectFile = (file) => {
+    if (!file) return;
+    
+    // Revoke previous URL to prevent memory leak
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setResult(null);
+    setError(null);
+  };
+
   const handleFileSelect = (event) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setResult(null);
-      setError(null);
-    }
+    selectFile(file);
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setResult(null);
-      setError(null);
+      selectFile(file);
     }
   };
 
@@ -46,16 +61,17 @@ export default function Analyze() {
     setError(null);
 
     try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
-      
-      await new Promise((resolve, reject) => {
-        reader.onload = () => resolve();
+      // Convert file to base64 using proper Promise
+      const base64String = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result;
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
         reader.onerror = reject;
+        reader.readAsDataURL(selectedFile);
       });
-
-      const base64String = reader.result.split(',')[1];
 
       // Call analyze endpoint
       const response = await fetch(`${API_BASE_URL}/api/analyze/base64`, {
@@ -82,6 +98,10 @@ export default function Analyze() {
   };
 
   const handleReset = () => {
+    // Revoke URL to prevent memory leak
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setSelectedFile(null);
     setPreviewUrl(null);
     setResult(null);
