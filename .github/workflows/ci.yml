@@ -20,6 +20,11 @@ jobs:
           cache: "pip"
       - run: pip install -r requirements.txt
       - run: python -m py_compile $(git ls-files '*.py' | tr '\n' ' ')
+      - name: Run backend tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key-for-ci' }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m pytest tests/ -v --tb=short
   frontend:
     runs-on: ubuntu-latest
     defaults:

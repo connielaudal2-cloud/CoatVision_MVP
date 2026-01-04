@@ -7,6 +7,8 @@
   - `SUPABASE_SERVICE_KEY`: service role key (server-only)
   - `NODE_ENV`: production
   - `SECRET_KEY`: generated locally (see scripts/bootstrap-e2e.ps1)
+  - `OPENAI_API_KEY`: OpenAI API key for Sparks platform
+  - `OPENAI_MODEL`: OpenAI model (default: gpt-4o-mini)
 - Frontend envs: see [frontend/.env.example](frontend/.env.example)
   - `VITE_API_URL`: backend base URL
   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
@@ -173,6 +175,8 @@ Create a `.env` file at the repository root (example shown above). Common enviro
 - FRONTEND_PORT - Port for the frontend (default: 3000)
 - NODE_ENV - development/production
 - EXPO_PUBLIC_API_URL - Backend API URL consumed by mobile app
+- OPENAI_API_KEY - OpenAI API key for Sparks code generation (required for AI features)
+- OPENAI_MODEL - OpenAI model to use (default: gpt-4o-mini)
 
 Be careful not to commit secrets. Add `.env` to `.gitignore` if not already present.
 
@@ -220,13 +224,15 @@ CoatVision includes AI-ready infrastructure but requires configuration to enable
 
 **Current Capabilities:**
 - ✅ **OpenCV Image Processing** - Basic edge detection and coating analysis
-- ⚠️ **OpenAI Ready** - Dependency installed, awaiting API key configuration
+- ✅ **OpenAI Ready** - Dependency installed, awaiting API key configuration
+- ✅ **Sparks Platform** - Real-time code generation service
 - ⚠️ **LYXbot Agent** - Placeholder endpoints ready for AI integration
 
 **To Enable AI Features:**
 1. Set up OpenAI API key in `.env` file:
    ```bash
    OPENAI_API_KEY=sk-your-key-here
+   OPENAI_MODEL=gpt-4o-mini  # or gpt-4o for better quality
    ```
 2. Follow the [OpenAI Integration Guide](./OPENAI_INTEGRATION_GUIDE.md)
 3. Restart backend service
@@ -235,6 +241,66 @@ CoatVision includes AI-ready infrastructure but requires configuration to enable
 - Endpoint: `POST /api/lyxbot/command`
 - Status: `GET /api/lyxbot/status`
 - Provides conversational AI for coating analysis assistance
+
+### Sparks Platform - Real-Time Code Generation
+
+The Sparks platform provides AI-powered code generation capabilities integrated into CoatVision.
+
+**API Endpoints:**
+- `POST /api/sparks/generate` - Generate code based on requirements
+- `GET /api/sparks/health` - Check Sparks service health
+
+**Usage Example:**
+
+```bash
+# Generate a web application
+curl -X POST http://localhost:8000/api/sparks/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "Create a simple todo list application with user authentication",
+    "app_type": "web",
+    "framework": "FastAPI",
+    "additional_requirements": "Use PostgreSQL database and JWT authentication"
+  }'
+```
+
+**Request Parameters:**
+- `description` (required): Detailed description of the app/system to generate (10-5000 characters)
+- `app_type` (optional): Type of application - "web", "mobile", "api", etc. (default: "web")
+- `framework` (optional): Preferred framework (e.g., "FastAPI", "React", "React Native")
+- `additional_requirements` (optional): Extra requirements (max 2000 characters)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": "# Generated code here...",
+  "app_type": "web",
+  "framework": "FastAPI",
+  "timestamp": "2026-01-04T21:00:00",
+  "model_used": "gpt-4o-mini"
+}
+```
+
+**Features:**
+- ✅ Real-time code generation using OpenAI GPT models
+- ✅ Support for multiple application types (web, mobile, API)
+- ✅ Framework-specific code generation
+- ✅ Input validation and error handling
+- ✅ Comprehensive logging
+- ✅ Security through input validation and rate limiting
+
+**Configuration:**
+The Sparks service requires the following environment variables:
+- `OPENAI_API_KEY`: Your OpenAI API key (required)
+- `OPENAI_MODEL`: Model to use for code generation (default: "gpt-4o-mini")
+
+**Testing:**
+Run Sparks tests with:
+```bash
+cd backend
+OPENAI_API_KEY=test-key python -m pytest tests/test_sparks.py -v
+```
 
 For questions about the "Sparks" AI platform or any missing AI features, see [AI_PLATFORM_STATUS.md](./AI_PLATFORM_STATUS.md).
 
