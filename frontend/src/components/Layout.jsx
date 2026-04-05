@@ -17,6 +17,7 @@ export default function Layout({ children }) {
       }}>
         <h2 style={{ margin: "0 0 20px 0", fontSize: "1.2rem" }}>CoatVision</h2>
         <Link to="/" style={linkStyle}>Dashboard</Link>
+        <Link to="/analyze" style={linkStyle}>Analyser</Link>
         <Link to="/jobs" style={linkStyle}>Jobber</Link>
         <Link to="/agents" style={linkStyle}>Agenter</Link>
         <Link to="/reports" style={linkStyle}>Rapporter</Link>
