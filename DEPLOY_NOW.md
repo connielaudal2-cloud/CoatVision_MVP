@@ -42,15 +42,16 @@ OPENAI_MODEL=gpt-4o-mini
 - Wait for "Live" status
 - Note your service URL: `https://<service-name>.onrender.com`
 
-## 5. Vercel Frontend
+## 5. Netlify Frontend
 
-1. In your Vercel project for `coatvision-app`
-2. Go to Settings → Environment Variables
-3. Set:
+1. In Netlify, open your site's **Site Settings → Environment Variables**
+2. Set:
    - `VITE_BACKEND_URL` = `https://<your-render-service>.onrender.com`
    - `VITE_COATVISION_USE_REMOTE` = `1`
-4. **DO NOT** add `OPENAI_API_KEY` to Vercel
-5. Redeploy
+   - `VITE_SUPABASE_URL` = your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY` = your Supabase anon key
+3. **DO NOT** add `OPENAI_API_KEY` as a frontend environment variable
+4. Trigger a new deploy (Deploys → Trigger deploy)
 
 ## 6. Mobile (Expo)
 
@@ -97,6 +98,5 @@ python backend/scripts/verify_prod.py https://<your-render-service>.onrender.com
 
 ## Security Notes
 
-- Rotate your OpenAI key if it was ever in Vercel client envs
 - Keep `ADMIN_TOKEN` secret; it protects write endpoints
 - After testing, restrict CORS from `*` to your actual domains
