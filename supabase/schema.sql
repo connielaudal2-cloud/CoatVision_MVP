@@ -89,6 +89,11 @@ returns jsonb language sql stable security definer as $$
   );
 $$;
 
+create or replace function public.get_latest_jobs(p_limit int)
+returns setof public.jobs language sql stable security definer as $$
+  select * from public.jobs order by created_at desc limit greatest(p_limit, 1);
+$$;
+
 create or replace function public.get_latest_analyses(p_limit int)
 returns setof public.analyses language sql stable security definer as $$
   select * from public.analyses order by created_at desc limit greatest(p_limit, 1);

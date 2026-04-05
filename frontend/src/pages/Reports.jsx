@@ -2,7 +2,7 @@
 import React from "react";
 
 const REPORT_URL = (jobId) => 
-  `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/api/report/demo${jobId ? `?job_id=${jobId}` : ""}`;
+  `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/report/demo${jobId ? `?job_id=${jobId}` : ""}`;
 
 export default function Reports() {
   const openDemo = () => {

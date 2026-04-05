@@ -1,5 +1,5 @@
 // frontend/src/pages/Dashboard.jsx
-// v1
+// v2
 import React, { useEffect, useState } from "react";
 import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import KpiCard from "../components/KpiCard";
@@ -19,11 +19,9 @@ export default function Dashboard() {
       }
 
       try {
-        const { data, error } = await supabase
-          .from("analysis_results")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(10);
+        // Use security-definer RPC to bypass RLS when reading with anon key.
+        // The table is "analyses" (not "analysis_results") and metrics are in a JSONB column.
+        const { data, error } = await supabase.rpc("get_latest_analyses", { p_limit: 10 });
 
         if (error) throw error;
         setResults(data || []);
@@ -38,15 +36,15 @@ export default function Dashboard() {
     fetchResults();
   }, []);
 
-  // Calculate average metrics
+  // Metrics are stored as JSONB inside the "metrics" column.
   const avgCvi = results.length > 0
-    ? (results.reduce((sum, r) => sum + (r.cvi || 0), 0) / results.length).toFixed(1)
+    ? (results.reduce((sum, r) => sum + (r.metrics?.cvi || 0), 0) / results.length).toFixed(1)
     : "—";
   const avgCqi = results.length > 0
-    ? (results.reduce((sum, r) => sum + (r.cqi || 0), 0) / results.length).toFixed(1)
+    ? (results.reduce((sum, r) => sum + (r.metrics?.cqi || 0), 0) / results.length).toFixed(1)
     : "—";
   const avgCoverage = results.length > 0
-    ? (results.reduce((sum, r) => sum + (r.coverage || 0), 0) / results.length).toFixed(1)
+    ? (results.reduce((sum, r) => sum + (r.metrics?.coverage || 0), 0) / results.length).toFixed(1)
     : "—";
 
   return (
@@ -105,20 +103,22 @@ export default function Dashboard() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={thStyle}>ID</th>
+                <th style={thStyle}>Filnavn</th>
                 <th style={thStyle}>CVI</th>
                 <th style={thStyle}>CQI</th>
                 <th style={thStyle}>Dekning</th>
+                <th style={thStyle}>Status</th>
                 <th style={thStyle}>Dato</th>
               </tr>
             </thead>
             <tbody>
               {results.map((r) => (
                 <tr key={r.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={tdStyle}>{r.id}</td>
-                  <td style={tdStyle}>{r.cvi?.toFixed(1) || "—"}%</td>
-                  <td style={tdStyle}>{r.cqi?.toFixed(1) || "—"}%</td>
-                  <td style={tdStyle}>{r.coverage?.toFixed(1) || "—"}%</td>
+                  <td style={tdStyle}>{r.filename || "—"}</td>
+                  <td style={tdStyle}>{r.metrics?.cvi?.toFixed(1) ?? "—"}%</td>
+                  <td style={tdStyle}>{r.metrics?.cqi?.toFixed(1) ?? "—"}%</td>
+                  <td style={tdStyle}>{r.metrics?.coverage?.toFixed(1) ?? "—"}%</td>
+                  <td style={tdStyle}>{r.status || "—"}</td>
                   <td style={tdStyle}>
                     {r.created_at ? new Date(r.created_at).toLocaleDateString("no-NO") : "—"}
                   </td>
