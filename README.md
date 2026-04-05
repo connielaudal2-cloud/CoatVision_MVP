@@ -1,17 +1,35 @@
+# CoatVision_MVP
+
+CoatVision is a coating analysis application with a FastAPI backend and a React web dashboard.
+
+> **Current focus: web platform first.**
+> The mobile app (React Native/Expo) exists in the repository but is **not part of the active delivery** at this time.
+
+## Stack
+
+| Layer | Platform |
+|---|---|
+| Database / Auth / Storage | **Supabase** |
+| Frontend hosting | **Netlify** |
+| Backend hosting | Render (Docker / FastAPI) |
+| Code / CI | **GitHub** + GitHub Actions |
+
+**Vercel and Fly.io are not used in this repository.**
+
 ## Deployment (Render) and Environment
 
-- Backend primary URL: update frontend/mobile to use your current Render service URL. Example: https://coatvision-mvp-lyxvision.onrender.com
+- Backend primary URL: update frontend to use your current Render service URL. Example: `https://coatvision-mvp-lyxvision.onrender.com`
 - Required backend envs on Render:
   - `DATABASE_URL`: Supabase Postgres URI
-  - `SUPABASE_URL`: https://<project>.supabase.co
-  - `SUPABASE_SERVICE_KEY`: service role key (server-only)
+  - `SUPABASE_URL`: `https://<project>.supabase.co`
+  - `SUPABASE_SERVICE_KEY`: service role key (server-only, never expose to frontend)
   - `NODE_ENV`: production
   - `SECRET_KEY`: generated locally (see scripts/bootstrap-e2e.ps1)
-- Frontend envs: see [frontend/.env.example](frontend/.env.example)
+- Frontend envs (set in Netlify → Site Settings → Environment Variables):
   - `VITE_API_URL`: backend base URL
   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-- Mobile envs:
-  - Use `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` (never service key)
+- Mobile envs (out of current scope):
+  - `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` (never service key)
 
 ### Supabase Schema
 - Apply via SQL Editor using [supabase/schema.sql](supabase/schema.sql) or run: `supabase/apply-schema.ps1` (requires `psql`).
@@ -19,18 +37,8 @@
 
 ### Local Quickstart
 - Execute [scripts/bootstrap-e2e.ps1](scripts/bootstrap-e2e.ps1) to build backend (Docker), optionally apply schema, and verify.
-# CoatVision_MVP
 
-CoatVision is a coating analysis application with a FastAPI backend, React dashboard, and React Native mobile app.
 
-## 🚀 Deploy to Production
-
-**Ready to deploy?** See the deployment guides:
-- **[Quick Deploy Guide](./QUICK_DEPLOY.md)** - Fast deployment to Render
-- **[Full Deployment Guide](./DEPLOYMENT.md)** - Complete instructions (English)
-- **[Norwegian Guide](./DEPLOYMENT_NO.md)** - Norsk deployment guide
-- **[Deployment Checklist](./DEPLOYMENT_CHECKLIST.md)** - Step-by-step checklist
-- **[Architecture Overview](./ARCHITECTURE.md)** - System architecture diagrams
 
 ## Quick Start
 
@@ -300,20 +308,29 @@ This repository includes a basic CI workflow (`.github/workflows/ci.yml`) that:
 
 ## Deployment to Production
 
-### Deploy to Render (Recommended)
+### Backend — Render
 
-CoatVision is ready for one-click deployment to Render:
+CoatVision backend is ready for deployment to Render:
 
 1. **Push to GitHub**: `git push origin main`
 2. **Go to Render Dashboard**: https://dashboard.render.com
 3. **Click "New +" → "Blueprint"**
 4. **Select your repository**: `Coatvision/CoatVision_MVP`
-5. **Click "Apply"** - Render deploys everything automatically!
+5. **Click "Apply"** — Render deploys the backend automatically.
 
 **What gets deployed:**
-- ✅ Backend API (FastAPI) - Python web service
-- ✅ Frontend Dashboard (React/Vite) - Static site
-- ❌ Mobile App - Deploy via Expo/App Stores separately
+- ✅ Backend API (FastAPI) — Python web service on Render
+- ✅ Frontend Dashboard (React/Vite) — static site on **Netlify** (see below)
+- ⏸️ Mobile App — out of current scope
+
+### Frontend — Netlify
+
+1. Connect the repository to Netlify (New site → import from GitHub)
+2. Set **Base directory**: `frontend`, **Build command**: `npm ci && npm run build`, **Publish directory**: `dist`
+3. Add environment variables in Netlify → Site Settings → Environment Variables (see section above)
+4. Deploy — Netlify builds and serves the React dashboard.
+
+See [docs/NETLIFY_FRONTEND_CHECKLIST.md](./docs/NETLIFY_FRONTEND_CHECKLIST.md) for a step-by-step checklist.
 
 **Deployment Documentation:**
 - [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - Quick start guide
@@ -322,11 +339,11 @@ CoatVision is ready for one-click deployment to Render:
 - [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) - Step-by-step checklist
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
 
-**Environment Variables:**
-After deployment, configure these in Render Dashboard:
-- `SECRET_KEY` - Auto-generated for JWT signing
-- `OPENAI_API_KEY` - Your OpenAI API key (optional)
-- `DATABASE_URL` - Database connection (optional, uses SQLite by default)
+**Environment Variables (Render backend):**
+- `SECRET_KEY` — for JWT signing
+- `OPENAI_API_KEY` — your OpenAI API key (optional)
+- `DATABASE_URL` — Supabase Postgres URI
+- `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
 
 ### Alternative Deployment Options
 

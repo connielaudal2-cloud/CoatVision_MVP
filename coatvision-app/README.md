@@ -2,7 +2,7 @@
 
 Configure environment so the app talks to the public backend (not localhost):
 
-- Vercel (frontend): set `VITE_BACKEND_URL` to your Render backend URL and `VITE_COATVISION_USE_REMOTE=1`.
+- Netlify (frontend): set `VITE_BACKEND_URL` to your backend URL and `VITE_COATVISION_USE_REMOTE=1`.
 - Expo (mobile): set `EXPO_PUBLIC_COATVISION_API_BASE_URL` and `EXPO_PUBLIC_COATVISION_USE_REMOTE=1`.
 
 See `.env.example` for sample values.
