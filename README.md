@@ -23,6 +23,17 @@
 
 CoatVision is a coating analysis application with a FastAPI backend, React dashboard, and React Native mobile app.
 
+## Active Stack
+
+| Layer | Service |
+|---|---|
+| Database / Auth / Storage | **Supabase** |
+| Frontend deployment | **Netlify** |
+| Backend deployment | **Render** |
+| Code & PR flow | **GitHub** |
+
+> **Note:** Vercel is **not** used in this project. Fly.io is **not** used in this project. Mobile app deployment is not an active deliverable at this time.
+
 ## 🚀 Deploy to Production
 
 **Ready to deploy?** See the deployment guides:
@@ -300,20 +311,36 @@ This repository includes a basic CI workflow (`.github/workflows/ci.yml`) that:
 
 ## Deployment to Production
 
-### Deploy to Render (Recommended)
+### Backend – Render
 
-CoatVision is ready for one-click deployment to Render:
+Deploy the FastAPI backend as a Web Service on [Render](https://dashboard.render.com):
 
 1. **Push to GitHub**: `git push origin main`
-2. **Go to Render Dashboard**: https://dashboard.render.com
-3. **Click "New +" → "Blueprint"**
-4. **Select your repository**: `Coatvision/CoatVision_MVP`
-5. **Click "Apply"** - Render deploys everything automatically!
+2. **Go to Render Dashboard** → "New +" → "Blueprint"
+3. **Select repository**: `connielaudal2-cloud/CoatVision_MVP`
+4. **Click "Apply"** – Render auto-deploys from `render.yaml`
 
-**What gets deployed:**
-- ✅ Backend API (FastAPI) - Python web service
-- ✅ Frontend Dashboard (React/Vite) - Static site
-- ❌ Mobile App - Deploy via Expo/App Stores separately
+**What gets deployed via Render:**
+- ✅ Backend API (FastAPI/Python)
+- ❌ Mobile App – not an active deliverable
+
+### Frontend – Netlify
+
+The React/Vite dashboard (`frontend/`) is deployed to **Netlify** as a static site.
+
+- Build command: `npm ci && npm run build`
+- Publish directory: `frontend/dist`
+- SPA redirect rule: `/* → /index.html` (configured in `netlify.toml`)
+- Set `VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` in Netlify environment variables
+
+### Database / Auth / Storage – Supabase
+
+This project uses **Supabase** for database, authentication, and storage.
+
+- Schema: see [`supabase/schema.sql`](supabase/schema.sql)
+- Apply via Supabase SQL Editor or `supabase/apply-schema.ps1`
+- Required backend secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` (set in Render, never committed)
+- Frontend uses: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (set in Netlify, never committed)
 
 **Deployment Documentation:**
 - [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - Quick start guide
@@ -322,16 +349,9 @@ CoatVision is ready for one-click deployment to Render:
 - [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) - Step-by-step checklist
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
 
-**Environment Variables:**
-After deployment, configure these in Render Dashboard:
-- `SECRET_KEY` - Auto-generated for JWT signing
-- `OPENAI_API_KEY` - Your OpenAI API key (optional)
-- `DATABASE_URL` - Database connection (optional, uses SQLite by default)
-
 ### Alternative Deployment Options
 
 - **Docker**: Use the included `Dockerfile` and `docker-compose.yml`
-- **Other Platforms**: Use `Procfile` for Heroku-compatible platforms
 - **Manual**: Follow instructions in `DEPLOYMENT.md`
 
 ## Contributing
