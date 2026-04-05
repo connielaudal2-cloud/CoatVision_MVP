@@ -106,7 +106,7 @@ $json = [pscustomobject]@{
     }
     next_steps = @(
         'If REST RPC write succeeded, remove the verification record (res_verify) if desired via service role.',
-        'Set environment variables on Render/Vercel/Expo and redeploy services.',
+        'Set environment variables on Render/Netlify/Expo and redeploy services.',
         'Backend can now call insert_analysis_from_payload using service role to write analyses.'
     )
     timestamp = $timestamp
